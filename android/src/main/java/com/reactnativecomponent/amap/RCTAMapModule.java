@@ -1,8 +1,13 @@
 package com.reactnativecomponent.amap;
 
+import android.util.Log;
+
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
+import com.amap.api.services.help.Inputtips;
+import com.amap.api.services.help.InputtipsQuery;
+import com.amap.api.services.help.Tip;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
 import com.facebook.react.bridge.Arguments;
@@ -16,7 +21,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import java.util.List;
 
 
-public class RCTAMapModule extends ReactContextBaseJavaModule implements PoiSearch.OnPoiSearchListener{
+public class RCTAMapModule extends ReactContextBaseJavaModule implements PoiSearch.OnPoiSearchListener , Inputtips.InputtipsListener{
     ReactApplicationContext mContext;
 
     private PoiSearch poiSearch;
@@ -59,6 +64,48 @@ public class RCTAMapModule extends ReactContextBaseJavaModule implements PoiSear
                 mapView.setCenterLocation(coordinate.getDouble("latitude"), coordinate.getDouble("longitude"));
             }
         });
+    }
+
+    @ReactMethod
+    public void searchLocation(String value){
+        Log.v(value,"hahah");
+        InputtipsQuery inputquery = new InputtipsQuery(value, "");
+        inputquery.setCityLimit(true);//限制在当前城市
+
+        Inputtips inputTips = new Inputtips(mContext, inputquery);
+        inputTips.setInputtipsListener(this);
+        inputTips.requestInputtipsAsyn();
+
+    }
+
+    @Override
+    public void onGetInputtips(final List<Tip> tipList, int rCode) {
+        WritableMap dataMap = Arguments.createMap();
+        WritableArray array = Arguments.createArray();
+
+        if (rCode == 1000) {
+            for (Tip tip : tipList) {
+                WritableMap data = Arguments.createMap();
+                data.putString("name", tip.getName());
+                data.putString("address", tip.getAddress());
+                data.putString("uid", tip.getPoiID());
+                data.putString("adCode", tip.getAdcode());
+                data.putString("district", tip.getDistrict());
+                data.putDouble("longitude", tip.getPoint().getLongitude());
+                data.putDouble("latitude", tip.getPoint().getLatitude());
+                array.pushMap(data);
+            }
+            dataMap.putArray("searchResultList", array);
+        }
+        else {
+            WritableMap error = Arguments.createMap();
+            error.putString("code", String.valueOf(rCode));
+            dataMap.putMap("error", error);
+        }
+
+        mContext
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("amap.location.onLocationResult", dataMap);
     }
 
     @ReactMethod

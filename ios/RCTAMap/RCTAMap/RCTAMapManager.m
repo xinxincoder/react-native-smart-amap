@@ -131,6 +131,13 @@ RCT_EXPORT_METHOD(setOptions:(nonnull NSNumber *)reactTag :(nonnull NSDictionary
     
 }
 
+RCT_EXPORT_METHOD(searchLocation:(NSString *)keywords)
+{
+    AMapInputTipsSearchRequest *request=[[AMapInputTipsSearchRequest alloc] init];
+    request.keywords=keywords;
+    [self.search AMapInputTipsSearch:request];
+    
+}
 
 
 
@@ -651,6 +658,38 @@ RCT_EXPORT_METHOD(searchPoiByCenterCoordinate:(NSDictionary *)params)
                  };
     [self.bridge.eventDispatcher sendAppEventWithName:@"amap.onPOISearchDone"
                                                  body:result];
+}
+
+/* 提示搜索 */
+- (void)onInputTipsSearchDone:(AMapInputTipsSearchRequest *)request response:(AMapInputTipsSearchResponse *)response;
+{
+    
+    NSDictionary *result;
+    NSMutableArray *resultList;
+    resultList = [NSMutableArray arrayWithCapacity:response.tips.count];
+    if (response.tips.count > 0)
+    {
+        [response.tips enumerateObjectsUsingBlock:^(AMapTip *obj, NSUInteger idx, BOOL *stop) {
+            
+            [resultList addObject:@{
+                                    @"uid": obj.uid,
+                                    @"name": obj.name,
+                                    @"adcode": obj.adcode,
+                                    @"district": obj.district,
+                                    @"latitude": @(obj.location.latitude),
+                                    @"longitude": @(obj.location.longitude),
+                                    @"address": obj.address,
+                                    }];
+        }];
+    }
+    result = @{
+               @"searchResultList": resultList
+               };
+    
+    [self.bridge.eventDispatcher sendAppEventWithName:@"amap.location.onLocationResult"
+                                                 body:result
+     ];
+
 }
 
 

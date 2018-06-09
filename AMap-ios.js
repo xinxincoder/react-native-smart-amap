@@ -6,7 +6,6 @@
  */
 
 import React, {
-    PropTypes,
     Component,
 } from 'react'
 import {
@@ -16,6 +15,7 @@ import {
     findNodeHandle,
     Platform,
 } from 'react-native'
+const PropTypes = require('prop-types');
 
 const AMapManager = Platform.OS == 'ios' ? NativeModules.AMap : null
 
@@ -77,6 +77,10 @@ export default class AMap extends Component {
         //console.log('findNodeHandle => ')
         //console.log(findNodeHandle)
         AMapManager.setCenterCoordinate(findNodeHandle(this), coordinate)
+    }
+
+    searchLocation(value){
+        AMapManager.searchLocation(value)
     }
 }
 
