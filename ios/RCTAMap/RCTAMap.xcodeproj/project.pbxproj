@@ -247,6 +247,7 @@
 					"$(SRCROOT)/../../../../ios/Pods/AMapFoundation",
 					"$(SRCROOT)/../../../../ios/Pods/AMapSearch",
 					"$(SRCROOT)/../../../../ios/Pods/AMap3DMap",
+					"$(SRCROOT)/../../../../ios/Frameworks",
 					"$(SRCROOT)/../../../../ios",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -268,6 +269,7 @@
 					"$(SRCROOT)/../../../../ios/Pods/AMapFoundation",
 					"$(SRCROOT)/../../../../ios/Pods/AMapSearch",
 					"$(SRCROOT)/../../../../ios/Pods/AMap3DMap",
+					"$(SRCROOT)/../../../../ios/Frameworks",
 					"$(SRCROOT)/../../../../ios",
 				);
 				HEADER_SEARCH_PATHS = (
